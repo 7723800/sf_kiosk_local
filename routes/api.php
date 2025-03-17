@@ -14,4 +14,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post("/print-invoice", "\App\Http\Controllers\InvoiceController@printInvoice");
+Route::post("/print-invoice", "\App\Http\Controllers\TicketController@printTicket");

@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Rawilk\Printing\Facades\Printing;
 use Illuminate\Support\Facades\Storage;
 
-class InvoiceController extends Controller
+class TicketController extends Controller
 {
     /**
      * The number of attempts to retrying.
@@ -17,12 +17,12 @@ class InvoiceController extends Controller
     private $counter = 0;
 
     /**
-     * Download and print invoice.
+     * Download and print ticket.
      *
      * @param \Illuminate\Http\Request $request
-     * @return Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function printInvoice(Request $request): JsonResponse
+    public function printTicket(Request $request): JsonResponse
     {
         if ($this->counter == 3) {
             return response()->json();
@@ -31,19 +31,19 @@ class InvoiceController extends Controller
         $this->counter++;
         $filePath = parse_url($request->invoiceUrl, PHP_URL_PATH);
         $parts = explode("/", $filePath);
-        $invoiceName = end($parts);
+        $ticketName = end($parts);
 
         try {
-            Storage::disk('public')->put("/invoices/$invoiceName", file_get_contents($request->invoiceUrl));
+            Storage::disk('public')->put("/tickets/$ticketName", file_get_contents($request->invoiceUrl));
         } catch (\Throwable $th) {
             report($th);
             sleep(10);
-            return $this->printInvoice($request);
+            return $this->printTicket($request);
         }
 
         $printJob = Printing::newPrintTask()
             ->printer(env('CUPS_PRINTER_ID'))
-            ->file(storage_path() . "/app/public/invoices/$invoiceName")
+            ->file(storage_path() . "/app/public/tickets/$ticketName")
             ->send();
 
         return response()->json($printJob->id()); // the id number returned from the print server
