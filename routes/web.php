@@ -21,7 +21,6 @@ Route::get('/', function () {
 
 Route::get("/find_halyk_pos", function (Request $request) {
     $client = new Client(['headers' => ['Content-Type' => 'application/json'], 'timeout' => 2]);
-    $iPs = [];
     for ($i = 100; $i < 255; $i++) {
         $ip = "10.11.12.{$i}";
         try {
@@ -33,10 +32,10 @@ Route::get("/find_halyk_pos", function (Request $request) {
                     ]
                 ]
             ]);
-            $iPs[] = $ip;
+            return response($ip);
         } catch (\Throwable $th) {
             //throw $th;
         }
     }
-    return response()->json($iPs);
+    return response("Терминал не найден");
 });
